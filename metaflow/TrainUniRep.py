@@ -19,7 +19,7 @@ class TrainUniRep(FlowSpec):
 
     @step
     def end(self):
-        append_flow(current.flow_name, current.run_id, self.begin, datetime.datetime.now())
+        append_flow(current.flow_name, current.run_id, self.begin, datetime.now())
         print('TrainUniRep has finished.')
 
 
