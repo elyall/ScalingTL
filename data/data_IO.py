@@ -72,8 +72,8 @@ def download_from_s3(key, filename=None, directory=os.getcwd(), bucket="dataidea
 
 def datasets(name="mhc1"):
     if name=="mhc1":
-        filename = "./data/bdata.20130222.mhci.txt"
-        if not os.path.isfile(filename): download_from_s3("bdata.20130222.mhci.txt", "./data/bdata.20130222.mhci.txt")
+        filename = "./data/mhc1/bdata.20130222.mhci.txt"
+        if not os.path.isfile(filename): download_from_s3("bdata.20130222.mhci.txt", "./data/mhc1/bdata.20130222.mhci.txt")
         data = pd.read_csv(filename, delimiter="\t")
         seq = data["sequence"].tolist()
         val = data["meas"].tolist()
