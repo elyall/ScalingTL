@@ -1,4 +1,4 @@
-data/*
-models/*
+data/*/
+models/*/
 *.pyc
 __pycache__/
