@@ -11,7 +11,7 @@ class TrainUniRep(FlowSpec):
     @conda(libraries={'pandas':'0.23.4', 'numpy':'1.15.4', 'tensorflow':'1.3'}, python='3.6.8')
     @step
     def start(self):
-        self.start = datetime.now()
+        self.begin = datetime.now()
         with S3(run=self) as s3:
             seq = s3.get('s3://dataidealist/data/bdata.20130222.mhci.txt').text
         unirep_train(seq, vals)
@@ -19,7 +19,7 @@ class TrainUniRep(FlowSpec):
 
     @step
     def end(self):
-        append_flow(current.flow_name, current.run_id, self.start.strftime('%Y/%M/%d:%H:%M:%S'), datetime.datetime.now().strftime('%Y/%M/%d:%H:%M:%S'))
+        append_flow(current.flow_name, current.run_id, self.begin, datetime.datetime.now())
         print('TrainUniRep has finished.')
 
 

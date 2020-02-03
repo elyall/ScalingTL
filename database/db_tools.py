@@ -8,17 +8,18 @@ def init_table():
     connection = engine.connect()
     metadata = db.MetaData()
     tbl = db.Table('metaflow', metadata,
-                db.Column('flow', db.String(255)),
-                db.Column('index', db.Integer(), nullable=False),
-                db.Column('finished', db.DateTime(), nullable=True)
+                db.Column('flow', db.types.String(32), nullable=False),
+                db.Column('index', db.types.Integer(), nullable=False),
+                db.Column('start', db.types.DateTime(), nullable=True),
+                db.Column('finish', db.types.DateTime(), nullable=True)
                 )
     metadata.create_all(engine) #creates the table
 
-def append_flow(flow, index, time):
+def append_flow(flow, index, start, finish):
     connection = engine.connect()
     metadata = db.MetaData()
     tbl = db.Table('metaflow', metadata, autoload=True, autoload_with=engine)
-    query = db.insert(tbl).values(flow=flow, index=index, finished=time) 
+    query = db.insert(tbl).values(flow=flow, index=index, start=time, finish=time) 
     return(connection.execute(query))
 
 def read_table():
