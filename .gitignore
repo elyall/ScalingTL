@@ -1,0 +1,4 @@
+data/*
+models/*
+*.pyc
+__pycache__/
