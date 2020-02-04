@@ -19,7 +19,7 @@ Set up Batch compute environment by following `metaflow/cloudformation/README.md
 metaflow configure aws
 ```
 
-Install model registry database by following `database/README.md`.
+Install model registry database by following `mysql/README.md`.
 
 Install frontend by following `dash/README.md`.
 
