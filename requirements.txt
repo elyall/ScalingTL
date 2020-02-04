@@ -1,0 +1,12 @@
+# UniRep
+awscli==1.16.90
+numpy==1.15.4
+pandas==0.23.4
+
+# Metaflow
+metaflow==2.0.1
+# awscli
+
+# MySQL
+sqlalchemy==1.3.13
+pymysql==0.9.3
