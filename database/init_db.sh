@@ -1,5 +1,5 @@
 ## MySQL
-https://support.rackspace.com/how-to/install-mysql-server-on-the-ubuntu-operating-system/
+# https://support.rackspace.com/how-to/install-mysql-server-on-the-ubuntu-operating-system/
 sudo apt-get install mysql-server
 sudo service mysql start
 sudo mysql_secure_installation utility
@@ -24,18 +24,3 @@ CREATE USER 'db_user'@'%' IDENTIFIED BY 'uNw5^Hze6K&v24Z!PeCak*^n';
 GRANT ALL ON *.* to 'db_user'@'localhost';
 GRANT ALL ON *.* TO 'db_user'@'%';
 FLUSH PRIVILEGES;
-
-
-pip install pymysql
-
-
-## PostgreSQL
-https://blog.insightdatascience.com/simply-install-postgresql-58c1e4ebf252
-sudo apt install postgresql postgresql-contrib
-sudo service postgresql start
-
-sudo -u postgres -i
-psql
-CREATE USER db_user WITH PASSWORD 'uNw5^Hze6K&v24Z!PeCak*^n';
-CREATE DATABASE metaflow;
-GRANT ALL PRIVILEGES ON DATABASE metaflow TO db_user;
