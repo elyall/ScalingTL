@@ -63,6 +63,7 @@ sudo systemctl restart nginx
 ```
 
 SET UP "A RECORDS" AT DOMAIN HOST (i.e. NameCheap)
+
 Type | Host | Value | TTL
 --- | --- | --- | ---
 A | @   | XXX.XXX.XXX.XXX | Automatic
