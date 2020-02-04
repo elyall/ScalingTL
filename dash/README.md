@@ -62,12 +62,12 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-SET UP "A RECORDS" AT DOMAIN HOST (i.e. NameCheap)
+SET UP "A RECORDS" AT DOMAIN HOST (e.g. [NameCheap](https://www.namecheap.com/support/knowledgebase/article.aspx/319/2237/how-can-i-set-up-an-a-address-record-for-my-domain))
 
 Type | Host | Value | TTL
 --- | --- | --- | ---
-A | @   | XXX.XXX.XXX.XXX | Automatic
-A | www | XXX.XXX.XXX.XXX | Automatic  
+A | @   | xxx.xxx.xxx.xxx | Automatic
+A | www | xxx.xxx.xxx.xxx | Automatic  
 
 # [How to serve app with gunicorn](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04)
 
