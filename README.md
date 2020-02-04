@@ -25,11 +25,11 @@ git clone https://github.com/elyall/UniRep.git ./models/Unirep/
 
 Copy metaflow flow file
 ```
-cp metaflow/flow.py models/UniRep/
+cp metaflow/TrainUniRep.py models/UniRep/
 cd models/UniRep/
 ```
 
 Train model
 ```
-python3 train_flow.py run
+python3 TrainUniRep.py run
 ```
