@@ -19,16 +19,16 @@ Create MySQL user & database
 sudo mysql -u root
 ```
 ```SQL
-UPDATE mysql.user SET authentication_string = PASSWORD('YOUR PASSWORD HERE') WHERE User = 'root';
+UPDATE mysql.user SET authentication_string = PASSWORD('NEW_ROOT_PASSWORD_HERE') WHERE User = 'root';
 FLUSH PRIVILEGES;
 SELECT User, Host, plugin, authentication_string FROM mysql.user; /* list users */
 
 CREATE DATABASE metaflow;
 SHOW DATABASES; /* list databases */
 
-CREATE USER 'db_user'@'localhost' IDENTIFIED BY 'YOUR PASSWORD HERE';
-CREATE USER 'db_user'@'%' IDENTIFIED BY 'YOUR PASSWORD HERE';
-GRANT ALL ON *.* to 'db_user'@'localhost';
-GRANT ALL ON *.* TO 'db_user'@'%';
+CREATE USER 'USERNAME_HERE'@'localhost' IDENTIFIED BY 'USER_PASSWORD_HERE';
+CREATE USER 'USERNAME_HERE'@'%' IDENTIFIED BY 'USER_PASSWORD_HERE'; /* make user available remote */
+GRANT ALL ON *.* to 'USERNAME_HERE'@'localhost';
+GRANT ALL ON *.* TO 'USERNAME_HERE'@'%';
 FLUSH PRIVILEGES;
 ```
