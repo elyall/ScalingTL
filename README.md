@@ -23,9 +23,11 @@ Install model registry database by following `mysql/README.md`.
 
 Install frontend by following `dash/README.md`.
 
-Clone the model to use for transfer learning
+Clone the model and weights to use for transfer learning
 ```
 git clone https://github.com/elyall/UniRep.git ./models/Unirep/
+aws s3 sync --no-sign-request --quiet s3://unirep-public/1900_weights/ ./models/UniRep/data/1900_weights/
+aws s3 sync --no-sign-request --quiet s3://unirep-public/64_weights/ ./models/UniRep/data/64_weights/
 ```
 
 Copy metaflow flow file
