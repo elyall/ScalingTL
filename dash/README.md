@@ -62,6 +62,8 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
+If you want to see your website, make sure to update your host's firewall to allow incoming web traffic to your webserver. For instance, if you're using EC2, create a new security group that allows incoming traffic on ports 80 (HTTP) and 443 (HTTPS) and add it your instance hosting your website.
+
 SET UP "A RECORDS" AT DOMAIN HOST (e.g. [NameCheap](https://www.namecheap.com/support/knowledgebase/article.aspx/319/2237/how-can-i-set-up-an-a-address-record-for-my-domain))
 
 Type | Host | Value | TTL
