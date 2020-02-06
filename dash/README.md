@@ -1,3 +1,5 @@
+Below, make sure to replace `dataidealist.xyz` with your domain name, and `ubuntu` with your logged in username.
+
 # [How to install nginx on ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04)
 
 Install nginx
@@ -45,7 +47,7 @@ server {
         listen 80;
         listen [::]:80;
 
-        root /var/www/example.com/html;
+        root /var/www/dataidealist.xyz/html;
         index index.html index.htm index.nginx-debian.html;
 
         server_name dataidealist.xyz www.dataidealist.xyz;
