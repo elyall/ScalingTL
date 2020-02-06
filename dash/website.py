@@ -74,20 +74,19 @@ app.layout = html.Div(children=[
 
             html.Hr(),
             html.Button(
-                ['train'],
+                ['Train'],
                 id='btn_train'
             ),
-
             html.Hr(),
+
             html.H3(children='Training models:'),
 
             DataTable(
                 id='table_training',
                 data=df_running.to_dict('records'),
-                columns=[
-                    {"name": i, "id": i} for i in df_running.columns
-                ],
+                columns=[{"name": i, "id": i} for i in df_running.columns],
                 page_size=PAGE_SIZE,
+                page_current=0
             ),
 
             html.Button(
@@ -102,10 +101,9 @@ app.layout = html.Div(children=[
             DataTable(
                 id='table_models',
                 data=df_trained.to_dict('records'),
-                columns=[
-                    {"name": i, "id": i} for i in df_trained.columns
-                ],
+                columns=[{"name": i, "id": i} for i in df_trained.columns],
                 page_size=PAGE_SIZE,
+                page_current=0
             ),
 
             html.Button(
@@ -118,14 +116,12 @@ app.layout = html.Div(children=[
 
 def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
-
     decoded = base64.b64decode(content_string)
+    ext = filename.split('.')[-1]
     try:
-        if 'csv' in filename:
-            # Assume that the user uploaded a CSV file
+        if ext=='csv':
             df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), )
-        elif 'xls' in filename:
-            # Assume that the user uploaded an excel file
+        elif ext=='xls':
             df = pd.read_excel(io.BytesIO(decoded))
     except Exception as e:
         print(e)
@@ -140,7 +136,7 @@ def parse_contents(contents, filename, date):
         DataTable(
             data=df.to_dict('records'),
             columns=[{'name': i, 'id': i} for i in df.columns],
-            page_size=PAGE_SIZE,
+            page_size=PAGE_SIZE
         ),
 
     ])
@@ -156,26 +152,31 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
             zip(list_of_contents, list_of_names, list_of_dates)]
         return children
 
-@app.callback(
-    Output('table_training', 'data'),
+@app.callback(Output('table_training', 'data'),
     [Input('btn_training', 'n_clicks')])
-def update_table(n_clicks):
-    df = read_table('training')
+def update_training(n_clicks):
+    if n_clicks:
+        df = read_table('training')
+    else:
+        df = df_running
     return(df.to_dict('records'))
     
-@app.callback(
-    Output('table_models', 'data'),
+@app.callback(Output('table_models', 'data'),
     [Input('btn_models', 'n_clicks')])
-def update_table(n_clicks):
-    df = read_table('metaflow')
+def update_models(n_clicks):
+    if n_clicks:
+        df = read_table('metaflow')
+    else:
+        df = df_trained
     return(df.to_dict('records'))
 
-@app.callback(
-    Output('table_training', 'data'),
-    [Input('hidden-div', 'children')])
+@app.callback(Output('hidden-div', 'n_clicks'),
+    [Input('btn_train', 'n_clicks')])
 def train_model(n_clicks):
-    subprocess.Popen(["metaflow","TrainUniRep.py","run"])
-    return([])
+    if n_clicks:
+        subprocess.Popen(["python3","metaflow/TrainUniRep.py","--environment=conda","run"])
+        print('started flow')
+    return(0)
 
 if __name__ == '__main__':
     app.run_server(host='0.0.0.0',debug=True)
