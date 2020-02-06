@@ -22,11 +22,24 @@ def delete_table(table=TABLE_NAME):
     tbl = db.Table(table, metadata)
     tbl.drop(engine) #deletes the table
 
-def append_flow(data, columns=COLUMN_NAMES, table=TABLE_NAME):
+def read_table(table=TABLE_NAME):
+    return(pd.read_sql(table, con=engine))
+
+def append_row(data, columns=COLUMN_NAMES, table=TABLE_NAME):
     if type(data) is list: 
         data = [data] if type(data[0]) is not list else data
         data = pd.DataFrame(data, columns=columns)
     data.to_sql(table, con=engine, if_exists="append", index=False)
+
+def delete_row(row, table=TABLE_NAME):
+    # row can be dict or DataFrame with single row
+    df = read_table(table)
+    tbl = db.Table(table, metadata, autoload=True, autoload_with=engine)
+    cond = df.apply(lambda row: db.and_(tbl.c['flow'] == row['flow'], tbl.c['run'] == row['run']), axis=1)
+    cond = db.or_(*cond)
+    delete = tbl.delete().where(cond)
+    with engine.connect() as conn:
+        conn.execute(delete)
 
 def add_s3_flows(names="all", table=TABLE_NAME):
     if isinstance(names,str) and names=="all": 
@@ -43,21 +56,8 @@ def add_s3_flows(names="all", table=TABLE_NAME):
             finish = run.finished_at
             df = df.append(dict(zip(COLUMN_NAMES, [name, index, start, finish])), ignore_index=True)
     df = df.sort_values(by=COLUMN_NAMES[:2])
-    append_flow(df, table=table)
+    append_row(df, table=table)
 
 def reset_models_table(columns=COLUMN_NAMES, dtype=COLUMN_DTYPES):
-    create_tables(TABLE_NAME, columns=columns, dtype=dtype)
+    create_table(TABLE_NAME, columns=columns, dtype=dtype)
     add_s3_flows(names="all", table=TABLE_NAME)
-
-def read_table(table=TABLE_NAME):
-    return(pd.read_sql(table, con=engine))
-
-def delete_row(row, table=TABLE_NAME):
-    # row can be dict or single row of a dataframe
-    df = read_table(table)
-    tbl = db.Table(table, metadata, autoload=True, autoload_with=engine)
-    cond = df.apply(lambda row: db.and_(tbl.c['flow'] == row['flow'], tbl.c['run'] == row['run']), axis=1)
-    cond = db.or_(*cond)
-    delete = tbl.delete().where(cond)
-    with engine.connect() as conn:
-        conn.execute(delete)
