@@ -40,15 +40,23 @@ def download_url(url, directory=os.getcwd(), remove_zip=True):
     except:
         print("Failed: " + file_path)
 
-def upload_files_to_s3(file_paths, keys=None, path=None, bucket="dataidealist"):
+def upload_files_to_s3(file_paths, keys=None, s3_path=None, bucket="dataidealist"):
     file_paths = [file_paths] if isinstance(file_paths, str) else file_paths
     if keys is None: keys = [f.split("/")[-1] for f in file_paths]
-    if path: keys = [os.path.join(path, k) for k in keys]
+    if path: keys = [os.path.join(s3_path, k) for k in keys]
     responses = []
     s3_client = boto3.client('s3')
     for f, k in zip(file_paths, keys):
         print("Uploading to S3: " + f + " as " + k)
         responses.append(s3_client.upload_file(f, bucket, k))
+    return(responses, keys)
+
+def upload_folder_to_s3(directory, s3_path=None, bucket="dataidealist"):
+    with os.scandir(directory) as entries:
+        files = [entry.is_file() for entry in entries]
+        entries = entries[files]
+        files = [os.path.join(directory, entry) for entry in entries]
+        responses, keys = upload_files_to_s3(files, s3_path=s3_path, bucket=bucket)
     return(responses, keys)
 
 def upload_urls_to_s3(urls, bucket="dataidealist"):
@@ -70,12 +78,13 @@ def download_from_s3(key, filename=None, directory=os.getcwd(), bucket="dataidea
     s3 = boto3.client('s3')
     s3.download_file(bucket, key, file_path)
 
-def datasets(name="mhc1"):
+def datasets(name="mhc1", save_to_csv=False):
     if name=="mhc1":
         filename = "./data/mhc1/bdata.20130222.mhci.txt"
         if not os.path.isfile(filename): download_from_s3("bdata.20130222.mhci.txt", "./data/mhc1/bdata.20130222.mhci.txt")
         data = pd.read_csv(filename, delimiter="\t")
-        seq = data["sequence"].tolist()
-        val = data["meas"].tolist()
-        
+        sel = data[(data["species"]=="human") & (data["inequality"]=="=")]
+        if save_to_csv: sel[["sequence","meas"]].to_csv("./data/mhc1/bdata.20130222.mhci.csv")
+        seq = sel["sequence"].tolist()
+        val = sel["meas"].tolist()
     return(seq, val, data)
