@@ -52,7 +52,7 @@ def fit(seqs, vals,
     b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
     
     # Format input
-    with open("./data/formatted.txt", "w") as destination:
+    with open("formatted.txt", "w") as destination:
         for i,(seq,val) in enumerate(zip(seqs,vals)):
             seq = seq.strip()
             if b.is_valid_seq(seq) and len(seq) < 275:
@@ -63,7 +63,7 @@ def fit(seqs, vals,
                 destination.write('\n')
 
     # Bucket data
-    bucket_op = b.bucket_batch_pad("./data/formatted.txt", interval=1000) # Large interval
+    bucket_op = b.bucket_batch_pad("formatted.txt", interval=1000) # Large interval
 
     # Obtain all of the ops needed to output a representation
     final_hidden, x_placeholder, batch_size_placeholder, seq_length_placeholder, initial_state_placeholder = (
