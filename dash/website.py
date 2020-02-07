@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # append ScalingTL & UniRep to path
-import sys, os
-sys.path.append(os.path.join('home','ubuntu','ScalingTL'))
-sys.path.append(os.path.join('home','ubuntu','ScalingTL','models','UniRep'))
+import sys
+sys.path.append('/home/ubuntu/ScalingTL')
+sys.path.append('home/ubuntu/ScalingTL/models/UniRep')
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -20,7 +20,7 @@ import pandas as pd
 import subprocess
 
 # loading model registries
-from mysql.db_tools import read_table
+from ScalingTL.mysql.db_tools import read_table
 
 PAGE_SIZE = 20
 
@@ -179,7 +179,7 @@ def update_models(n_clicks):
     [Input('btn_train', 'n_clicks')])
 def train_model(n_clicks):
     if n_clicks:
-        subprocess.Popen(["python3","/home/ubuntu/ScalingTL/metaflow/TrainUniRep.py","--environment=conda","run"])
+        subprocess.Popen(["python3","/home/ubuntu/ScalingTL/TrainUniRep.py","--environment=conda","run"])
         print('started flow')
     return(0)
 
