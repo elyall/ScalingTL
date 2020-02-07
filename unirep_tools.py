@@ -1,19 +1,30 @@
 import tensorflow as tf
 import numpy as np
+import os
 
+import subprocess
 
-def save_weights(sess, save_path="./output_weights"):
+import sys
+if sys.platform == "linux" or sys.platform == "linux2":
+    MODULE_PATH = '/home/ubuntu/ScalingTL/models/UniRep/'
+elif sys.platform == "darwin":
+    MODULE_PATH = '/Users/elyall/Dropbox/Projects/Insight/ScalingTL/models/UniRep/'
+sys.path.append(MODULE_PATH)
+
+def save_weights(sess, save_path=MODULE_PATH + "output/"):
         """
         Saves the weights of the model in dir_name in the format required 
         for loading in this module. Must be called within a tf.Session
         For which the weights are already initialized.
         """
         vs = tf.trainable_variables()
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
         for v in vs:
             name = v.name
             value = sess.run(v)
-            print(name)
-            print(value)
+            # print(name)
+            # print(value)
             np.save(os.path.join(save_path,name.replace('/', '_') + ".npy"), np.array(value))
         return(save_path)
             
@@ -30,10 +41,12 @@ def fit(seqs, vals,
 
     if full_model:        
         from unirep import babbler1900 as babbler # Import the mLSTM babbler model
-        MODEL_WEIGHT_PATH = "./data/1900_weights" # Where model weights are stored.
+        MODEL_WEIGHT_PATH = MODULE_PATH + "data/1900_weights" # Where model weights are stored.
+        subprocess.call(['aws','s3', 'sync', '--no-sign-request', '--quiet', 's3://unirep-public/1900_weights/', MODEL_WEIGHT_PATH]
     else:
         from unirep import babbler64 as babbler # Import the mLSTM babbler model
-        MODEL_WEIGHT_PATH = "./data/64_weights" # Where model weights are stored.
+        MODEL_WEIGHT_PATH = MODULE_PATH + "data/64_weights" # Where model weights are stored.
+        subprocess.call(['aws','s3', 'sync', '--no-sign-request', '--quiet', 's3://unirep-public/64_weights/', MODEL_WEIGHT_PATH]
 
     # Initialize UniRep
     b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
@@ -44,7 +57,7 @@ def fit(seqs, vals,
             seq = seq.strip()
             if b.is_valid_seq(seq) and len(seq) < 275:
                 formatted = ",".join(map(str,b.format_seq(seq)))
-                formatted = str(round(val))+","+formatted
+                formatted = str(int(round(val)))+","+formatted
                 if end_to_end: formatted = formatted+","+str(25) # append stop to end of sequence
                 destination.write(formatted)
                 destination.write('\n')

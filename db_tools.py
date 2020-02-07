@@ -61,3 +61,6 @@ def add_s3_flows(names="all", table=TABLE_NAME):
 def reset_models_table(columns=COLUMN_NAMES, dtype=COLUMN_DTYPES):
     create_table(TABLE_NAME, columns=columns, dtype=dtype)
     add_s3_flows(names="all", table=TABLE_NAME)
+
+def reset_training_table():
+    return(create_table("training", ["flow", "run", "start"], db.types.String(32)))

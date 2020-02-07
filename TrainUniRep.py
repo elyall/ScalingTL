@@ -1,13 +1,20 @@
-from metaflow import FlowSpec, step, IncludeFile, Parameter, conda, conda_base, batch, retry, current
+from metaflow import FlowSpec, step, IncludeFile, Parameter, conda, conda_base, current, S3, batch, retry
 from datetime import datetime
-from mysql.db_tools import append_row, delete_row
+from db_tools import append_row, delete_row
 
 from io import StringIO
 
 from os import listdir
 from os.path import isfile, join
 
-SAVE_PATH = './output/'
+import sys
+if sys.platform == "linux" or sys.platform == "linux2":
+    MODULE_PATH = '/home/ubuntu/ScalingTL/models/UniRep/'
+elif sys.platform == "darwin":
+    MODULE_PATH = '/Users/elyall/Dropbox/Projects/Insight/ScalingTL/models/UniRep/'
+sys.path.append(MODULE_PATH)
+
+SAVE_PATH = MODULE_PATH + "output/"
 
 @conda_base(libraries={'sqlalchemy':'1.3.13','pymysql':'0.9.3','pandas':'0.23.4'}, python='3.6.8')
 class TrainUniRep(FlowSpec):
@@ -15,7 +22,7 @@ class TrainUniRep(FlowSpec):
         'data_file',
         is_text=True,
         help='Input data',
-        default='/home/ubuntu/input/bdata.20130222.mhci.csv')
+        default='/home/ubuntu/ScalingTL/data/mhc1/bdata.20130222.mhci.csv')
     batch_size = Parameter('batch_size',
                         help='Batch size',
                         default=256)
@@ -24,7 +31,7 @@ class TrainUniRep(FlowSpec):
                         default=False)
     end_to_end = Parameter('end_to_end',
                         help='Train end to end',
-                        default=False
+                        default=False)
     learning_rate = Parameter('learning_rate',
                         help='Learning rate',
                         default=0.001)
@@ -33,7 +40,7 @@ class TrainUniRep(FlowSpec):
     @step
     def start(self):
         import pandas as pd
-        import models.unirep_tools as ut
+        import unirep_tools as ut
 
         # append to training registry
         self.begin = datetime.now()
@@ -43,7 +50,7 @@ class TrainUniRep(FlowSpec):
 
         # Load data
         data = StringIO(self.data_file)
-        df = pd.read_csv(data)
+        df = pd.read_csv(data, index_col=0)
         seqs = df.iloc[:,0].values
         vals = df.iloc[:,1].values
 
@@ -52,7 +59,7 @@ class TrainUniRep(FlowSpec):
                         batch_size=self.batch_size, 
                         full_model=self.full_model, 
                         end_to_end=self.end_to_end,
-                        learning_rate=self.learning_rate
+                        learning_rate=self.learning_rate,
                         save_path=SAVE_PATH)
         
         # Copy outputs to S3
