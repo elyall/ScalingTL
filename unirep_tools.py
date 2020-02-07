@@ -11,7 +11,7 @@ elif sys.platform == "darwin":
     MODULE_PATH = '/Users/elyall/Dropbox/Projects/Insight/ScalingTL/models/UniRep/'
 sys.path.append(MODULE_PATH)
 
-def save_weights(sess, save_path=MODULE_PATH + "output/"):
+def save_weights(sess, save_path="tmp/output/"):
         """
         Saves the weights of the model in dir_name in the format required 
         for loading in this module. Must be called within a tf.Session
@@ -29,7 +29,7 @@ def save_weights(sess, save_path=MODULE_PATH + "output/"):
         return(save_path)
             
 def fit(seqs, vals, 
-        save_path="./output_weights",
+        save_path="tmp/output/",
         batch_size=256, 
         full_model=False, 
         end_to_end=False, 
@@ -52,7 +52,7 @@ def fit(seqs, vals,
     b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
     
     # Format input
-    with open("formatted.txt", "w") as destination:
+    with open("tmp/formatted.txt", "w") as destination:
         for i,(seq,val) in enumerate(zip(seqs,vals)):
             seq = seq.strip()
             if b.is_valid_seq(seq) and len(seq) < 275:
@@ -63,7 +63,7 @@ def fit(seqs, vals,
                 destination.write('\n')
 
     # Bucket data
-    bucket_op = b.bucket_batch_pad("formatted.txt", interval=1000) # Large interval
+    bucket_op = b.bucket_batch_pad("tmp/formatted.txt", interval=1000) # Large interval
 
     # Obtain all of the ops needed to output a representation
     final_hidden, x_placeholder, batch_size_placeholder, seq_length_placeholder, initial_state_placeholder = (
