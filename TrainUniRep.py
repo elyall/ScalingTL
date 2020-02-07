@@ -47,8 +47,8 @@ class TrainUniRep(FlowSpec):
 
         # append to training registry
         self.begin = datetime.now()
-        self.row = pd.DataFrame([[current.flow_name, current.run_id, self.begin]], columns=["flow", "run", "start"])
-        append_row(self.row, columns=["flow", "run", "start"], table="training")
+        self.row = {"flow":[current.flow_name], "run":[current.run_id], "start":[self.begin]}
+        append_row(self.row, table="training")
         print(current)
 
         # Load data
@@ -81,8 +81,8 @@ class TrainUniRep(FlowSpec):
     @step
     def end(self):
         delete_row(self.row, table="training") # delete from training registry
-        self.row = pd.DataFrame([[current.flow_name, current.run_id, self.begin, datetime.now()]], columns=["flow", "run", "start", "finish"])
-        append_row(self.row,  columns=["flow", "run", "start", "finish"], table="metaflow") # append to trained registry
+        self.row["finish"] = [datetime.now()]
+        append_row(self.row, table="metaflow") # append to trained registry
         print('TrainUniRep has finished.')
 
 
