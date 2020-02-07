@@ -28,7 +28,9 @@ def read_table(table=TABLE_NAME):
 def append_row(data, columns=COLUMN_NAMES, table=TABLE_NAME):
     if type(data) is list: 
         data = [data] if type(data[0]) is not list else data
-        data = pd.DataFrame(data, columns=columns)
+        data = pd.DataFrame.from_dict(data)
+    elif type(data) is dict:
+        data = pd.DataFrame(data)
     data.to_sql(table, con=engine, if_exists="append", index=False)
 
 def delete_row(row, table=TABLE_NAME):
