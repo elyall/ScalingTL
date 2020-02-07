@@ -179,7 +179,7 @@ def update_models(n_clicks):
     [Input('btn_train', 'n_clicks')])
 def train_model(n_clicks):
     if n_clicks:
-        subprocess.Popen(["python3","metaflow/TrainUniRep.py","--environment=conda","run"])
+        subprocess.Popen(["python3","/home/ubuntu/ScalingTL/metaflow/TrainUniRep.py","--environment=conda","run"])
         print('started flow')
     return(0)
 
