@@ -174,6 +174,7 @@ def update_output2(value):
     if value=="mhc1":
         s3_path = "s3://dataidealist/bdata.20130222.mhci.csv"
         filename = download_from_s3("bdata.20130222.mhci.csv", directory=LOCAL_PATH)
+        print(filename)
         df = pd.read_csv(filename, nrows=100)
         children = html.Div([
             html.H5(filename.split("/")[-1]),
@@ -211,11 +212,13 @@ def update_models(n_clicks):
     Input('hidden-div', 'children')])
 def train_model(n_clicks, s3_path):
     if n_clicks and s3_path:
-        subprocess.Popen(["python3", MODULE_PATH+"TrainUniRep.py", 
-                    "--environment=conda", 
-                    "run",
-                    "--s3_file", s3_path])
-        print('started flow')
+        with open(LOCAL_PATH+"log.txt", "a") as logfile:
+            subprocess.Popen(["python3", MODULE_PATH+"TrainUniRep.py", 
+                        "--environment=conda", 
+                        "run",
+                        "--s3_file", s3_path],
+                        stdout= logfile,
+                        stderr= subprocess.STDOUT)
     return(0)
 
 if __name__ == '__main__':
