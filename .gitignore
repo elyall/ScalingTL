@@ -1,4 +1,4 @@
-data/*/
+tmp/
 models/*/
 *.pyc
 __pycache__/
