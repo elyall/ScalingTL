@@ -14,7 +14,7 @@ import pandas as pd
 # running metaflow
 import subprocess
 
-# loading models
+# loading model registries
 from mysql.db_tools import read_table
 
 PAGE_SIZE = 20
