@@ -18,11 +18,14 @@ SAVE_PATH = MODULE_PATH + "output/"
 
 @conda_base(libraries={'sqlalchemy':'1.3.13','pymysql':'0.9.3','pandas':'0.23.4'}, python='3.6.8')
 class TrainUniRep(FlowSpec):
-    data_file = IncludeFile(
-        'data_file',
+    local_file = IncludeFile(
+        'local_file',
         is_text=True,
         help='Input data',
-        default='/home/ubuntu/ScalingTL/data/mhc1/bdata.20130222.mhci.csv')
+        default=None)
+    s3_file = Parameter('s3_file',
+                        help='File on S3',
+                        default=None)
     batch_size = Parameter('batch_size',
                         help='Batch size',
                         default=256)
@@ -49,8 +52,12 @@ class TrainUniRep(FlowSpec):
         print(current)
 
         # Load data
-        data = StringIO(self.data_file)
-        df = pd.read_csv(data, index_col=0)
+        if self.local_file:
+            df = pd.read_csv(StringIO(self.local_file), index_col=0)
+        elif self.s3_file:
+            with S3() as s3:
+                s3obj = s3.get(self.s3_file)
+                df = pd.read_csv(s3obj.path, index_col=0)
         seqs = df.iloc[:,0].values
         vals = df.iloc[:,1].values
 
