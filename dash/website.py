@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# append ScalingTL & UniRep to path
+import sys, os
+sys.path.append(os.path.join('home','ubuntu','ScalingTL'))
+sys.path.append(os.path.join('home','ubuntu','ScalingTL','models','UniRep'))
+
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -120,7 +125,7 @@ def parse_contents(contents, filename, date):
     ext = filename.split('.')[-1]
     try:
         if ext=='csv':
-            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), )
+            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
         elif ext=='xls':
             df = pd.read_excel(io.BytesIO(decoded))
     except Exception as e:
