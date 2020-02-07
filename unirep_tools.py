@@ -42,11 +42,11 @@ def fit(seqs, vals,
     if full_model:        
         from unirep import babbler1900 as babbler # Import the mLSTM babbler model
         MODEL_WEIGHT_PATH = MODULE_PATH + "data/1900_weights" # Where model weights are stored.
-        subprocess.call(['aws','s3', 'sync', '--no-sign-request', '--quiet', 's3://unirep-public/1900_weights/', MODEL_WEIGHT_PATH]
+        subprocess.call(['aws','s3', 'sync', '--no-sign-request', '--quiet', 's3://unirep-public/1900_weights/', MODEL_WEIGHT_PATH])
     else:
         from unirep import babbler64 as babbler # Import the mLSTM babbler model
         MODEL_WEIGHT_PATH = MODULE_PATH + "data/64_weights" # Where model weights are stored.
-        subprocess.call(['aws','s3', 'sync', '--no-sign-request', '--quiet', 's3://unirep-public/64_weights/', MODEL_WEIGHT_PATH]
+        subprocess.call(['aws','s3', 'sync', '--no-sign-request', '--quiet', 's3://unirep-public/64_weights/', MODEL_WEIGHT_PATH])
 
     # Initialize UniRep
     b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
