@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # append ScalingTL & UniRep to path
 import sys
 if sys.platform == "linux" or sys.platform == "linux2":
@@ -8,27 +9,34 @@ elif sys.platform == "darwin":
 sys.path.append(MODULE_PATH)
 sys.path.append(MODULE_PATH + 'models/UniRep/')
 
+# website
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 
-# loading own data
+# loading data
 from dash_table import DataTable
 import base64
 import datetime
 import io
 import pandas as pd
+import os
 
 # running metaflow
 import subprocess
 
 # loading model registries
 from db_tools import read_table
+from data_IO import download_from_s3
 
 PAGE_SIZE = 20
+LOCAL_PATH = "tmp/"
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+if not os.path.exists(LOCAL_PATH):
+    os.makedirs(LOCAL_PATH) # create directory for objects pulled from S3
 df_trained = read_table("metaflow")
 df_running = read_table("training")
 
@@ -164,8 +172,9 @@ app.layout = html.Div(children=[
             [Input('select-data', 'value')])
 def update_output2(value):
     if value=="mhc1":
-        filename = MODULE_PATH+"data/mhc1/bdata.20130222.mhci.csv"
-        df = pd.read_csv(filename)
+        s3_path = "s3://dataidealist/bdata.20130222.mhci.csv"
+        filename = download_from_s3("bdata.20130222.mhci.csv", directory=LOCAL_PATH)
+        df = pd.read_csv(filename, nrows=100)
         children = html.Div([
             html.H5(filename.split("/")[-1]),
             DataTable(
@@ -176,8 +185,8 @@ def update_output2(value):
         ])
     else: 
         children = []
-        filename = None
-    return(children, filename)
+        s3_path = None
+    return(children, s3_path)
 
 @app.callback(Output('table_training', 'data'),
     [Input('btn_training', 'n_clicks')])
@@ -200,12 +209,12 @@ def update_models(n_clicks):
 @app.callback(Output('hidden-div', 'n_clicks'),
     [Input('btn_train', 'n_clicks'),
     Input('hidden-div', 'children')])
-def train_model(n_clicks, filename):
-    if n_clicks and filename:
+def train_model(n_clicks, s3_path):
+    if n_clicks and s3_path:
         subprocess.Popen(["python3", MODULE_PATH+"TrainUniRep.py", 
                     "--environment=conda", 
                     "run",
-                    "--data_file", filename])
+                    "--s3_file", s3_path])
         print('started flow')
     return(0)
 
