@@ -77,6 +77,7 @@ def download_from_s3(key, filename=None, directory=os.getcwd(), bucket="dataidea
     file_path = os.path.join(directory, filename)
     s3 = boto3.client('s3')
     s3.download_file(bucket, key, file_path)
+    return(file_path)
 
 def datasets(name="mhc1", save_to_csv=False):
     if name=="mhc1":
