@@ -35,11 +35,11 @@ def delete_row(row, table=TABLE_NAME):
     # row can be dict or DataFrame with single row
     df = read_table(table)
     tbl = db.Table(table, metadata, autoload=True, autoload_with=engine)
-    cond = df.apply(lambda row: db.and_(tbl.c['flow'] == row['flow'], tbl.c['run'] == row['run']), axis=1)
-    cond = db.or_(*cond)
+    cond = db.and_(tbl.c['flow'] == row['flow'], tbl.c['run'] == row['run'])
     delete = tbl.delete().where(cond)
     with engine.connect() as conn:
-        conn.execute(delete)
+        status = conn.execute(delete)
+    return(status)
 
 def add_s3_flows(names="all", table=TABLE_NAME):
     if isinstance(names,str) and names=="all": 
