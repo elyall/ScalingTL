@@ -43,7 +43,7 @@ def download_url(url, directory=os.getcwd(), remove_zip=True):
 def upload_files_to_s3(file_paths, keys=None, s3_path=None, bucket="dataidealist"):
     file_paths = [file_paths] if isinstance(file_paths, str) else file_paths
     if keys is None: keys = [f.split("/")[-1] for f in file_paths]
-    if path: keys = [os.path.join(s3_path, k) for k in keys]
+    if s3_path: keys = [os.path.join(s3_path, k) for k in keys]
     responses = []
     s3_client = boto3.client('s3')
     for f, k in zip(file_paths, keys):
