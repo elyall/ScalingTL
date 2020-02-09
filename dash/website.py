@@ -172,9 +172,8 @@ app.layout = html.Div(children=[
             [Input('select-data', 'value')])
 def update_output2(value):
     if value=="mhc1":
-        s3_path = "s3://dataidealist/bdata.20130222.mhci.csv"
-        filename = download_from_s3("bdata.20130222.mhci.csv", directory=LOCAL_PATH)
-        print(filename)
+        s3_path = "s3://metaflow-metaflows3bucket-g7dlyokq680q/data/bdata.20130222.mhci.csv"
+        filename = download_from_s3('data/bdata.20130222.mhci.csv', bucket='metaflow-metaflows3bucket-g7dlyokq680q', directory=LOCAL_PATH)
         df = pd.read_csv(filename, nrows=100)
         children = html.Div([
             html.H5(filename.split("/")[-1]),
