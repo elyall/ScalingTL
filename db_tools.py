@@ -10,8 +10,15 @@ COLUMN_DTYPES = db.types.String(32)
 # COLUMN_NAMES = ["flow", "run", "start"]
 # COLUMN_DTYPES = db.types.String(32)
 
+create_path = 'mysql+pymysql://db_user:uNw5^Hze6K&v24Z!PeCak*^n@'
+import sys
+if sys.platform == "linux" or sys.platform == "linux2":
+    create_path = create_path + '10.20.0.5'
+elif sys.platform == "darwin":
+    create_path = create_path + 'ec2-44-230-85-65.us-west-2.compute.amazonaws.com'
 
-engine = db.create_engine('mysql+pymysql://db_user:uNw5^Hze6K&v24Z!PeCak*^n@ec2-52-38-203-135.us-west-2.compute.amazonaws.com/metaflow')
+create_path = create_path + '/metaflow'
+engine = db.create_engine(create_path)
 metadata = db.MetaData()
 
 def create_table(table=TABLE_NAME, columns=COLUMN_NAMES, dtype=COLUMN_DTYPES, if_exists="replace"):
