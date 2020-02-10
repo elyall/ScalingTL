@@ -66,18 +66,31 @@ sudo systemctl restart nginx
 
 If you want to see your website, make sure to update your host's firewall to allow incoming web traffic to your webserver. For instance, if you're using EC2, create a new security group that allows incoming traffic on ports 80 (HTTP) and 443 (HTTPS) and add it your instance hosting your website.
 
-SET UP "A RECORDS" AT DOMAIN HOST (e.g. [NameCheap](https://www.namecheap.com/support/knowledgebase/article.aspx/319/2237/how-can-i-set-up-an-a-address-record-for-my-domain))
+# SET UP "A RECORDS" AT DOMAIN HOST (e.g. [NameCheap](https://www.namecheap.com/support/knowledgebase/article.aspx/319/2237/how-can-i-set-up-an-a-address-record-for-my-domain))
 
 Type | Host | Value | TTL
 --- | --- | --- | ---
 A | @   | xxx.xxx.xxx.xxx | Automatic
 A | www | xxx.xxx.xxx.xxx | Automatic  
 
+# If using Metaflow: Install Conda
+
+```
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+conda install python==3.6.8 #required by tf==1.3 (UniRep)
+conda config --add channels conda-forge
+conda install awscli
+aws configure #configure aws credentials
+pip install metaflow
+metaflow configure aws #configuration from cloudformation output
+```
+
 # [How to serve app with gunicorn](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04)
 
 Install gunicorn
 ```
-pip install wheel gunicorn flask
+pip install dash wheel gunicorn flask
 ```
 
 Create website and wsgi socket
@@ -131,8 +144,8 @@ After=network.target
 User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/website
-Environment="PATH=/home/ubuntu/.local/bin"
-ExecStart=/home/ubuntu/.local/bin/gunicorn --workers 3 --bind unix:website.sock -m 007 wsgi:server
+Environment="PATH=/home/ubuntu/miniconda3/bin"
+ExecStart=/home/ubuntu/miniconda3/bin/gunicorn --workers 3 --bind unix:website.sock -m 007 wsgi:server
 
 [Install]
 WantedBy=multi-user.target
