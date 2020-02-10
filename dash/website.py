@@ -7,7 +7,6 @@ if sys.platform == "linux" or sys.platform == "linux2":
 elif sys.platform == "darwin":
     MODULE_PATH = '/Users/elyall/Dropbox/Projects/Insight/ScalingTL/'
 sys.path.append(MODULE_PATH)
-sys.path.append(MODULE_PATH + 'models/UniRep/')
 
 # website
 import dash
@@ -28,7 +27,7 @@ import subprocess
 
 # loading model registries
 from db_tools import read_table
-from data_IO import download_from_s3
+from data_IO import download_obj_from_s3
 
 PAGE_SIZE = 20
 LOCAL_PATH = "tmp/"
@@ -173,7 +172,7 @@ app.layout = html.Div(children=[
 def update_output2(value):
     if value=="mhc1":
         s3_path = "s3://metaflow-metaflows3bucket-g7dlyokq680q/data/bdata.20130222.mhci.csv"
-        filename = download_from_s3('data/bdata.20130222.mhci.csv', bucket='metaflow-metaflows3bucket-g7dlyokq680q', directory=LOCAL_PATH)
+        filename = download_obj_from_s3('data/bdata.20130222.mhci.csv', bucket='metaflow-metaflows3bucket-g7dlyokq680q', directory=LOCAL_PATH)
         df = pd.read_csv(filename, nrows=100)
         children = html.Div([
             html.H5(filename.split("/")[-1]),
