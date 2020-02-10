@@ -1,17 +1,11 @@
 import tensorflow as tf
 import numpy as np
 import os
+from data_IO import download_folder_from_s3
 
-import subprocess
+BUCKET = 'metaflow-metaflows3bucket-g7dlyokq680q'
 
-import sys
-if sys.platform == "linux" or sys.platform == "linux2":
-    MODULE_PATH = '/home/ubuntu/ScalingTL/models/UniRep/'
-elif sys.platform == "darwin":
-    MODULE_PATH = '/Users/elyall/Dropbox/Projects/Insight/ScalingTL/models/UniRep/'
-sys.path.append(MODULE_PATH)
-
-def save_weights(sess, save_path="tmp/output/"):
+def save_weights(sess, save_path="output/"):
         """
         Saves the weights of the model in dir_name in the format required 
         for loading in this module. Must be called within a tf.Session
@@ -39,14 +33,15 @@ def fit(seqs, vals,
     tf.set_random_seed(42)
     np.random.seed(42)
 
+    if not os.path.exists("tmp/"): os.makedirs("tmp/")
     if full_model:        
         from unirep import babbler1900 as babbler # Import the mLSTM babbler model
-        MODEL_WEIGHT_PATH = MODULE_PATH + "data/1900_weights" # Where model weights are stored.
-        subprocess.call(['aws','s3', 'sync', '--no-sign-request', '--quiet', 's3://unirep-public/1900_weights/', MODEL_WEIGHT_PATH])
+        MODEL_WEIGHT_PATH = "tmp/1900_weights" # Where model weights are stored.
+        download_folder_from_s3(s3_path='1900_weights/', directory='tmp/', bucket=BUCKET)
     else:
         from unirep import babbler64 as babbler # Import the mLSTM babbler model
-        MODEL_WEIGHT_PATH = MODULE_PATH + "data/64_weights" # Where model weights are stored.
-        subprocess.call(['aws','s3', 'sync', '--no-sign-request', '--quiet', 's3://unirep-public/64_weights/', MODEL_WEIGHT_PATH])
+        MODEL_WEIGHT_PATH = "tmp/64_weights" # Where model weights are stored.
+        download_folder_from_s3(s3_path='64_weights/', directory='tmp/', bucket=BUCKET)
 
     # Initialize UniRep
     b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)

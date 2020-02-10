@@ -7,14 +7,8 @@ from io import StringIO
 from os import listdir
 from os.path import isfile, join
 
-import sys
-if sys.platform == "linux" or sys.platform == "linux2":
-    MODULE_PATH = '/home/ubuntu/ScalingTL/models/UniRep/'
-elif sys.platform == "darwin":
-    MODULE_PATH = '/Users/elyall/Dropbox/Projects/Insight/ScalingTL/models/UniRep/'
-sys.path.append(MODULE_PATH)
-
-SAVE_PATH = MODULE_PATH + "output/"
+SAVE_PATH = "output/"
+BUCKET = 'metaflow-metaflows3bucket-g7dlyokq680q'
 
 @conda_base(libraries={'sqlalchemy':'1.3.13','pymysql':'0.9.3','pandas':'0.23.4'}, python='3.6.8')
 class TrainUniRep(FlowSpec):
@@ -73,7 +67,7 @@ class TrainUniRep(FlowSpec):
         saved_files = [f for f in listdir(save_path) if isfile(join(save_path, f))]
         file_paths = [join(save_path, f) for f in saved_files]
         put_files = tuple(zip(saved_files, file_paths))
-        with S3(s3root='s3://dataidealist/models/'+current.pathspec+'/') as s3:
+        with S3(s3root='s3://'+BUCKET+'/models/'+current.pathspec+'/') as s3:
             s3.put_files(put_files)
 
         self.next(self.end)

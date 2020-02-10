@@ -45,7 +45,7 @@ def download_url(url, directory=LOCAL_PATH, remove_zip=True):
 
 def upload_files_to_s3(file_paths, keys=None, s3_path=None, bucket=BUCKET):
     file_paths = [file_paths] if isinstance(file_paths, str) else file_paths
-    if keys is None: keys = [f.split("/")[-1] for f in file_paths]
+    if keys is None: keys = [os.path.basename(f) for f in file_paths]
     if s3_path: keys = [os.path.join(s3_path, k) for k in keys]
     responses = []
     s3_client = boto3.client('s3')
@@ -55,12 +55,14 @@ def upload_files_to_s3(file_paths, keys=None, s3_path=None, bucket=BUCKET):
     return(responses, keys)
 
 def upload_folder_to_s3(directory, s3_path=S3_PATH, bucket=BUCKET):
-    with os.scandir(directory) as entries:
-        files = [entry.is_file() for entry in entries]
-        entries = entries[files]
-        files = [os.path.join(directory, entry) for entry in entries]
-        responses, keys = upload_files_to_s3(files, s3_path=s3_path, bucket=bucket)
-    return(responses, keys)
+    responses = []
+    s3_client = boto3.client('s3')
+    for root,dirs,files in os.walk(directory):
+        for file in files:
+            file_path = file
+            if s3_path: file_path = os.path.join(s3_path,file_path)
+            responses.append(s3_client.upload_file(os.path.join(root,file), bucket, file_path))
+    return(responses)
 
 def upload_urls_to_s3(urls, s3_path=S3_PATH, bucket=BUCKET):
     urls = [urls] if isinstance(urls, str) else urls
@@ -75,12 +77,21 @@ def upload_urls_to_s3(urls, s3_path=S3_PATH, bucket=BUCKET):
     responses, keys = upload_files_to_s3(file_paths, s3_path=s3_path, bucket=bucket)
     return(responses, keys)
 
-def download_from_s3(key, bucket=BUCKET, directory=LOCAL_PATH, filename=None):
-    if filename is None: filename = key.split('/')[-1]
+def download_obj_from_s3(key, bucket=BUCKET, directory=LOCAL_PATH, filename=None):
+    if filename is None: filename = os.path.basename(key)
     file_path = os.path.join(directory, filename) if directory else filename
     s3 = boto3.client('s3')
     s3.download_file(bucket, key, file_path)
     return(file_path)
+
+def download_folder_from_s3(s3_path=S3_PATH, directory=LOCAL_PATH, bucket=BUCKET):
+    s3 = boto3.resource('s3')
+    bucket_obj = s3.Bucket(bucket)
+    for object in bucket_obj.objects.filter(Prefix = s3_path):
+        file_path = os.path.dirname(object.key)
+        if directory: file_path = os.path.join(directory, file_path)
+        if not os.path.exists(file_path): os.makedirs(file_path)
+        bucket_obj.download_file(object.key, os.path.join(file_path, os.path.basename(object.key)))
 
 def datasets(name="mhc1", directory=LOCAL_PATH, save_to_csv=False):
     if name=="mhc1":
@@ -88,7 +99,7 @@ def datasets(name="mhc1", directory=LOCAL_PATH, save_to_csv=False):
         file_path = os.path.join(directory, filename)
         if not os.path.isfile(file_path): 
             if not os.path.exists(directory): os.makedirs(directory)
-            download_from_s3(S3_PATH + filename, filename=filename, directory=directory, bucket=BUCKET)
+            download_obj_from_s3(S3_PATH + filename, filename=filename, directory=directory, bucket=BUCKET)
         data = pd.read_csv(file_path, delimiter="\t")
         sel = data[(data["species"]=="human") & (data["inequality"]=="=")]
         if save_to_csv: sel[["sequence","meas"]].to_csv(filename[:-3]+"csv")
