@@ -45,4 +45,4 @@ Navigate to the [website], upload your data or select a preloaded dataset, and i
 
 
 [website]: https://dataidealist.xyz
-[architecture]: https://github.com/elyall/ScalingTL/architecture.png
+[architecture]: https://github.com/elyall/ScalingTL/blob/master/architecture.png
