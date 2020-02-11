@@ -63,7 +63,7 @@ app.layout = html.Div(children=[
                 ],
                 value='none'
             ),
-            
+
             # html.H6(children='OR'),
             # html.Div(children='''
             #     Train on your own data: load a .csv file where the first column is amino acid sequences and any additional column is a measured feature
@@ -182,7 +182,7 @@ def update_output2(value):
                 page_size=PAGE_SIZE
             )
         ])
-    else: 
+    else:
         children = []
         s3_path = None
     return(children, s3_path)
@@ -195,7 +195,7 @@ def update_training(n_clicks):
     else:
         df = df_running
     return(df.to_dict('records'))
-    
+
 @app.callback(Output('table_models', 'data'),
     [Input('btn_models', 'n_clicks')])
 def update_models(n_clicks):
@@ -211,13 +211,13 @@ def update_models(n_clicks):
 def train_model(n_clicks, s3_path):
     if n_clicks and s3_path:
         with open(LOCAL_PATH+"log.txt", "a") as logfile:
-            subprocess.Popen(["python3", MODULE_PATH+"TrainUniRep.py", 
-                        "--environment=conda", 
+            subprocess.Popen(["python3", MODULE_PATH+"TrainUniRep.py",
                         "run",
-                        "--s3_file", s3_path],
+                        "--s3_file", s3_path,
+                        "--with", "batch"],
                         stdout= logfile,
                         stderr= subprocess.STDOUT)
     return(0)
 
 if __name__ == '__main__':
-    app.run_server(host='0.0.0.0',debug=True)
+    app.run_server(host='0.0.0.0')

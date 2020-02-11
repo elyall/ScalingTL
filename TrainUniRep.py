@@ -1,4 +1,4 @@
-from metaflow import FlowSpec, step, IncludeFile, Parameter, conda, conda_base, current, S3, batch, retry
+from metaflow import FlowSpec, step, IncludeFile, Parameter, current, S3
 from datetime import datetime
 from db_tools import append_row, delete_row
 
@@ -10,7 +10,6 @@ from os.path import isfile, join
 SAVE_PATH = "output/"
 BUCKET = 'metaflow-metaflows3bucket-g7dlyokq680q'
 
-@conda_base(libraries={'sqlalchemy':'1.3.13','pymysql':'0.9.3','pandas':'0.23.4'}, python='3.6.8')
 class TrainUniRep(FlowSpec):
     local_file = IncludeFile(
         'local_file',
@@ -33,7 +32,6 @@ class TrainUniRep(FlowSpec):
                         help='Learning rate',
                         default=0.001)
 
-    @conda(libraries={'numpy':'1.15.4','tensorflow':'1.3'})
     @step
     def start(self):
         import pandas as pd
