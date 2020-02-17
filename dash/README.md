@@ -73,17 +73,20 @@ Type | Host | Value | TTL
 A | @   | xxx.xxx.xxx.xxx | Automatic
 A | www | xxx.xxx.xxx.xxx | Automatic  
 
-# If using Metaflow: Install Conda
+# If using Metaflow: install conda environment
 
 ```
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
-conda install python==3.6.8 #required by tf==1.3 (UniRep)
+conda install python==3.6.8
 conda config --add channels conda-forge
-conda install awscli
-aws configure #configure aws credentials
-pip install metaflow
-metaflow configure aws #configuration from cloudformation output
+cd ~
+git clone https://github.com/elyall/ScalingTL
+cd ScalingTL
+which pip # ensure using conda environment's pip (if not specify full path)
+pip install -r requirements.txt
+aws configure # configure aws credentials
+metaflow configure aws # copy 'outputs' from CloudFormation and container registry and image from ECR
 ```
 
 # [How to serve app with gunicorn](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04)
@@ -188,7 +191,8 @@ sudo ufw delete allow 'Nginx HTTP'
 ```
 
 # Update website
-Change website by altering `~/website/website.py` then run:
+Change website by updating `~/website/website.py` then run:
 ```
+cp ~/ScalingTL/dash/website.py ~/website/
 sudo systemctl restart website
 ```
