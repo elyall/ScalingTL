@@ -263,7 +263,7 @@ def update_training(n_clicks):
     [Input('btn_models', 'n_clicks')])
 def update_models(n_clicks):
     if n_clicks:
-        df = read_table('metaflow')
+        df = read_table('models')
     else:
         df = df_trained
     return(df.to_dict('records'))
