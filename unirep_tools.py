@@ -4,6 +4,7 @@ import os
 from data_IO import download_folder_from_s3
 
 BUCKET = 'metaflow-metaflows3bucket-g7dlyokq680q'
+LOCAL_WEIGHT_PATH = 'weights/'
 
 def save_weights(sess, save_path="output/"):
         """
@@ -23,9 +24,10 @@ def save_weights(sess, save_path="output/"):
         return(save_path)
             
 def fit(seqs, vals, 
-        save_path="tmp/output/",
+        save_path="output/",
+        weights_path=None,
         batch_size=256, 
-        full_model=False, 
+        model_size=64, 
         end_to_end=False, 
         learning_rate=.001):
     
@@ -33,21 +35,21 @@ def fit(seqs, vals,
     tf.set_random_seed(42)
     np.random.seed(42)
 
-    if not os.path.exists("tmp/"): os.makedirs("tmp/")
-    if full_model:        
-        from unirep import babbler1900 as babbler # Import the mLSTM babbler model
-        MODEL_WEIGHT_PATH = "tmp/1900_weights" # Where model weights are stored.
-        download_folder_from_s3(s3_path='1900_weights/', directory='tmp/', bucket=BUCKET)
-    else:
-        from unirep import babbler64 as babbler # Import the mLSTM babbler model
-        MODEL_WEIGHT_PATH = "tmp/64_weights" # Where model weights are stored.
-        download_folder_from_s3(s3_path='64_weights/', directory='tmp/', bucket=BUCKET)
+    # Download starting weights
+    if weights_path is None:
+        if model_size==1900: weights_path = "models/UniRep/base1900/"
+        elif model_size==64: weights_path = "models/UniRep/base64/"
+    local_weight_path = download_folder_from_s3(s3_path=weights_path, directory=LOCAL_WEIGHT_PATH, bucket=BUCKET)
+
+    # Import babbler
+    if model_size==1900: from unirep import babbler1900 as babbler # Import the mLSTM babbler model
+    elif model_size==64: from unirep import babbler64   as babbler # Import the mLSTM babbler model
 
     # Initialize UniRep
-    b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
+    b = babbler(batch_size=batch_size, model_path=local_weight_path)
     
     # Format input
-    with open("tmp/formatted.txt", "w") as destination:
+    with open("formatted.txt", "w") as destination:
         for i,(seq,val) in enumerate(zip(seqs,vals)):
             seq = seq.strip()
             if b.is_valid_seq(seq) and len(seq) < 275:
@@ -58,7 +60,7 @@ def fit(seqs, vals,
                 destination.write('\n')
 
     # Bucket data
-    bucket_op = b.bucket_batch_pad("tmp/formatted.txt", interval=1000) # Large interval
+    bucket_op = b.bucket_batch_pad("formatted.txt", interval=1000) # Large interval
 
     # Obtain all of the ops needed to output a representation
     final_hidden, x_placeholder, batch_size_placeholder, seq_length_placeholder, initial_state_placeholder = (
@@ -115,6 +117,6 @@ def fit(seqs, vals,
             )
             Loss.append(loss_)
             print("Iteration {0}: {1}".format(i, loss_))
-        return(save_weights(sess, save_path))
+        save_weights(sess, save_path)
         
-    return(Loss)
+    return(Loss, save_path)
