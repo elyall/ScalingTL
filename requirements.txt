@@ -1,5 +1,5 @@
 # UniRep
-numpy==1.15.4
+numpy==1.22.0
 pandas==0.24.0
 tensorflow==1.3
 
